@@ -2,14 +2,14 @@
 layout: about
 title: about
 permalink: /
-subtitle: <a href='#'>Affiliations</a>. Address. Contacts. Motto. Etc.
+subtitle: <a href='#'>Affiliations</a>. Süderstraße 30, 20097 Hamburg, Germany
 
 profile:
   align: right
   image: markus_pic_color.png
   image_circular: false # crops the image to make it circular
   more_info: >
-    <p>Data Analysis</p>
+    <p>Data Scientist</p>
     <p>Cancer Registry</p>
     <p>Hamburg, Germany</p>
 
@@ -28,5 +28,3 @@ latest_posts:
 ---
 
 Working as a data scientist at the cancer registry in Hamburg.
-
-Süderstraße 30 in 20097 Hamburg
