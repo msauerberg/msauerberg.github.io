@@ -48,11 +48,11 @@ ninja.data = [{
             window.location.href = "/blog/2025/kitesurfing/";
           
         },
-      },{id: "post-sailing-summer-2025",
+      },{id: "post-sailing-impressions",
         
-          title: "Sailing, summer 2025",
+          title: "Sailing impressions",
         
-        description: "sailing",
+        description: "Sailing in Heiligenhafen",
         section: "Posts",
         handler: () => {
           
