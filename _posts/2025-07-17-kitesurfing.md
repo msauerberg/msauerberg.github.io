@@ -10,10 +10,10 @@ A day kiting in Gold, Fehmarn. Photos taken in summer 2025.
 
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/kite-walk.JPG" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/kite-walk.JPG" class="img-fluid rounded z-depth-1" zoomable=true %}
     </div>
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/kite-nexus3.JPG" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/kite-nexus3.JPG" class="img-fluid rounded z-depth-1" zoomable=true %}
     </div>
 </div>
 <div class="caption">
@@ -29,4 +29,7 @@ As my kite was already back in the backpack, I borrowed a friend's Duatone kite 
     <div class="col-sm mt-3 mt-md-0">
         {% include figure.liquid loading="eager" path="assets/img/kite-sun2.JPG" class="img-fluid rounded z-depth-1" zoomable=true %}
     </div>
+</div>
+<div class="caption">
+    Sunset in Gold, Fehmarn.
 </div>
