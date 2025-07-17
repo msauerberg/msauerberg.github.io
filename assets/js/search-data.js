@@ -25,7 +25,7 @@ ninja.data = [{
           },
         },{id: "nav-repositories",
           title: "repositories",
-          description: "Edit the `_data/repositories.yml` and change the `github_users` and `github_repos` lists to include your own GitHub profile and repositories.",
+          description: "Currently, I am working on extracting substances and protocols from free text fields using NLP methods.",
           section: "Navigation",
           handler: () => {
             window.location.href = "/repositories/";
@@ -56,7 +56,7 @@ ninja.data = [{
         section: "Posts",
         handler: () => {
           
-            window.location.href = "/blog/2025/text/";
+            window.location.href = "/blog/2025/sailing/";
           
         },
       },{id: "books-the-godfather",
