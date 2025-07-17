@@ -2,7 +2,7 @@
 # Site settings
 # -----------------------------------------------------------------------------
 
-title: M. Sauerberg # the website title (if blank, full name will be used instead)
+title: Markus Sauerberg # the website title (if blank, full name will be used instead)
 first_name: Markus
 middle_name:
 last_name: Sauerberg
@@ -190,6 +190,8 @@ exclude:
   - _pages/books.md
   - _pages/projects.md
   - _pages/teaching.md
+  - _pages/profiles.md
+  - _pages/dropdown.md
   - purgecss.config.js
   - README.md
   - readme_preview/
