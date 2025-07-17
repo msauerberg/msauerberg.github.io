@@ -1,11 +1,9 @@
 ---
 layout: post
-title: Kite surfing, summer 2025
-date: 2025-07-17 14:00:00
+title: "Kite surfing, summer 2025"
+date: 2025-07-17
 description: Kite surfing
-tags: kite
-categories: kite-posts
-thumbnail: assets/img/kite-sun.JPG
+tags: [kitesurfing]
 ---
 
 A day kiting in Gold, Fehmarn. Photos taken in summer 2025.
