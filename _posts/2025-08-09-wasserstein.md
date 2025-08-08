@@ -6,6 +6,7 @@ description: Compare the Wasserstein distance with the difference in life expect
 tags: [python]
 ---
 
+# Jupyter Notebook
 
 ```liquid
 {::nomarkdown}
