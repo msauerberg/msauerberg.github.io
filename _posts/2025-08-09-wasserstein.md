@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Wasserstein distance and life expectancy differences
+title: "Wasserstein distance and life expectancy differences"
 date: 2025-08-09
 description: Compare the Wasserstein distance with the difference in life expectancy
 tags: [python]
