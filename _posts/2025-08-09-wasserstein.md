@@ -51,12 +51,10 @@ e_{0,A}-e_{0,B} = \int_0^{\omega}(l_A(x)-l_B(x))dx
 
 It is well-known in surival analysis that PDF, CDF, and the survivorship function are directly linked to each other. That is, the survivorship function can be derived from the PDF and is complement of the CDF,
 
-\[
-\begin{align}
+\begin{aligned}
 S(x) &= 1- \int_{-\infty}^x f(u)du \\
 &= 1-F(x).
-\end{align}
-\]
+\end{aligned}
 
 As shown above, the Wasserstein distance is the area between two CDFs. Substituting the CDFs with the life table survivorship function $$l_x$$ gives,
 
