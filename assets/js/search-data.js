@@ -37,7 +37,18 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/cv/";
           },
-        },{id: "post-kite-surfing-summer-2025",
+        },{id: "post-wasserstein-distance",
+        
+          title: "Wasserstein distance",
+        
+        description: "Wasserstein",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2025/wasserstein/";
+          
+        },
+      },{id: "post-kite-surfing-summer-2025",
         
           title: "Kite surfing, summer 2025",
         
