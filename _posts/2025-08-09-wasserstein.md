@@ -11,7 +11,13 @@ tags: [python]
 The Wasserstein distance (or earth mover's distance) computes the minimum "work" needed to transform one distribution into the other and refers to *optimal transport theory*.
 According to [https://docs.scipy.org](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.wasserstein_distance.html), the Wasserstein distance "is a similarity metric between two probability distributions. In the discrete case, the Wasserstein distance can be understood as the cost of an optimal transport plan to convert one distribution into the other. The cost is calculated as the product of the amount of probability mass being moved and the distance it is being moved."
 
-In the one-dimensional case and when the cost function is defined as c(x,y)=|x-y|, the Wasserstein distance can be expressed as,
+In the one-dimensional case and when the cost function is defined as, 
+
+$$
+c(x,y)=|x-y|,
+$$
+
+the Wasserstein distance can be expressed as,
 
 $$
 W(u,v)=\int_{-\infty}^{\infty}|U-V|,
