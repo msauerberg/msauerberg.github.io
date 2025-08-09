@@ -51,10 +51,12 @@ e_{0,A}-e_{0,B} = \int_0^{\omega}(l_A(x)-l_B(x))dx
 
 It is well-known in surival analysis that PDF, CDF, and the survivorship function are directly linked to each other. That is, the survivorship function can be derived from the PDF and is complement of the CDF,
 
+$$
 \begin{aligned}
 S(x) &= 1- \int_{-\infty}^x f(u)du \\
 &= 1-F(x).
 \end{aligned}
+$$
 
 As shown above, the Wasserstein distance is the area between two CDFs. Substituting the CDFs with the life table survivorship function $$l_x$$ gives,
 
@@ -175,15 +177,20 @@ if condition:
 else:
     print("Sx1 not always >= Sx2 for all x")
 
+
+
 Difference_in_e0_US_2019_and_US_1980 = round(e0_2019_US - e0_1980_US, 2)
 Wasserstein_between_2019_US_1980_US = get_Wasserstein(dx_2019_US, dx_1980_US)
+Wasserstein_scipy = round(wasserstein_distance(ages, ages, dx_2019_US, dx_1980_US), 2)
 
 print(f"The difference in e0 is: {Difference_in_e0_US_2019_and_US_1980}")
 print(f"The Wasserstein distance is: {Wasserstein_between_2019_US_1980_US}")
+print(f"The Wasserstein distance from Scipy: {Wasserstein_scipy}")
 
 #Sx1 >= Sx2 for all x
 #The difference in e0 is: 5.21
 #The Wasserstein distance is: 5.21
+#The Wasserstein distance from Scipy: 5.21
 
 plot_dx(ages, dx_1990_Germany, dx_1990_US, e0_1990_Germany, e0_1990_Germany, "Germany 1990", "USA 1990")
 plot_Sx(ages, Sx_1980_US, Sx_2019_US, "Germany 1990", "USA 1990")
@@ -211,13 +218,16 @@ else:
 
 Difference_in_e0_Germany_1990_and_US_1990 = round(e0_1990_Germany - e0_1990_US, 2)
 Wasserstein_between_Germany_1990_US_1990_US = get_Wasserstein(dx_1990_Germany, dx_1990_US)
+Wasserstein_scipy = round(wasserstein_distance(ages, ages, dx_1990_Germany, dx_1990_US), 2)
 
 print(f"The difference in e0 is: {Difference_in_e0_Germany_1990_and_US_1990}")
 print(f"The Wasserstein distance is: {Wasserstein_between_Germany_1990_US_1990_US}")
+print(f"The Wasserstein distance from Scipy is: {Wasserstein_scipy}")
 
 #Sx1 not always >= Sx2 for all x
 #The difference in e0 is: -0.05
 #The Wasserstein distance is: 1.56
+#The Wasserstein distance from Scipy is: 1.56
 ```
 
 # Conclusion
