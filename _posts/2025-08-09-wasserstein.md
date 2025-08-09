@@ -19,9 +19,9 @@ $$
 
 the Wasserstein distance can be expressed as,
 
-$$
+\begin{equation}
 W(u,v)=\int_{-\infty}^{\infty}|U-V|,
-$$
+\end{equation}
 
 where $$U$$ and $$V$$ are the respective cumulative distribution functions (CDF) of $$u$$ and $$v$$.
 See Santambrogio (2015), chapter 2 for more details [Santambrogio (2015)](https://link.springer.com/book/10.1007/978-3-319-20828-2).
@@ -30,37 +30,39 @@ See Santambrogio (2015), chapter 2 for more details [Santambrogio (2015)](https:
 
 In demography, life expectancy at birth ($$e_0$$) measures the expected number of life years on the basis of a set of age-specific mortality rates. $$e_0$$ is derived from a period life table - a procedure where age-specific mortality rates are applied to hypothetical cohort to calculate the number of persons alive and deceased in each age interval. This table will then be used to derive the expected number of life years. Usually, the size of the initial life table population is set to 100 000 persons. The number of deceased persons in each age interval is denoted as $$d_x$$, while $$l_x$$ gives the age-specific number of persons alive. When setting the initial size of the life table population to $$1$$, the $$d_x$$ function can be seen as a probability density function (PDF). $$e_0$$ is the mean age at death,
 
-$$
+\begin{equation}
 e_0=\frac{\int_0^{\omega}x\cdot d(x)dx}{\int_0^{\omega}d(x)dx},
-$$
+\end{equation}
 
 where $\omega$ denotes the upper age interval.
 A more popular formular, however, is expressing $$e_0$$ as the area under the survivorship curve,
 
-$$
+\begin{equation}
 e_0=\int_0^{\omega}l(x)dx.
-$$
+\end{equation}
 
 The difference between two $$e_0$$ values is then,
 
-$$
-e_{0,A}-e_{0,A} = \int_0^{\omega}(l_A(x)-l_B(x))dx
-$$
+\begin{equation}
+e_{0,A}-e_{0,B} = \int_0^{\omega}(l_A(x)-l_B(x))dx
+\end{equation}
 
 # The relationship between the Wasserstein distance and difference between two life expectancy at birth values
 
 It is well-known in surival analysis that PDF, CDF, and the survivorship function are directly linked to each other. That is, the survivorship function can be derived from the PDF and is complement of the CDF,
 
-$$
-S(x)=1-\int_{-\infty}^x f(u)du\\
-=1-F(x).
-$$
+\[
+\begin{align}
+S(x) &= 1- \int_{-\infty}^x f(u)du \\
+&= 1-F(x).
+\end{align}
+\]
 
 As shown above, the Wasserstein distance is the area between two CDFs. Substituting the CDFs with the life table survivorship function $$l_x$$ gives,
 
-$$
+\begin{equation}
 W(d_A,d_B)=\int_{0}^{\omega}|l_A(x)-l_B(x)|dx.
-$$
+\end{equation}
 
 This implies that the difference between two $$e_0$$ values is equal to the Wasserstein distance between two life table age-at-death distributions, whenever $$l_A(x) >= l_B(x)$$ for all $$x$$.
 
@@ -222,7 +224,7 @@ print(f"The Wasserstein distance is: {Wasserstein_between_Germany_1990_US_1990_U
 
 # Conclusion
 
-When the survivorship functions between two populations do not crossover, the Wasserstein distance is equal to the difference in $$e_0$$. Hence, we do not compare the means of two age-at death distibutions anymore - as usually when comparing two $$e_0$$ values - but we solve the optimal transport problem. This offers a novel interpretation. There are also cases where the two measures do not correspond to each other. The difference in $$e_0$$ can suggest rather small mortality differences between two populations. The Wasserstein distance captures those differences between the two age-at death distributions better. Since the Wasserstein distance can be derived easily it makes sense to calculate both measures.
+When the survivorship functions between two populations do not crossover, the Wasserstein distance is equal to the difference in $$e_0$$. Hence, we do not compare the means of two age-at death distibutions anymore - as usually when comparing two $$e_0$$ values - but we solve the optimal transport problem. This offers a novel interpretation to $$e_0$$ differences. There are also cases where the two measures do not correspond to each other. For instance, between the US and Germany in 1990, the difference in $$e_0$$ suggests rather small mortality differences between the two populationss. The Wasserstein distance captures those differences between the two age-at death distributions better as it reflects the absolute difference between the survivorship functions. In contrast, differences in $$e_0$$ are more "net differences" in survivorship because positive and negative difference in $$l(x)$$ can cancel each other out. This makes sense when the aim is examining the differences in the expected number of life years. It does not, however, give us a good sense of how different the underlying age-at-death distributions actually are. For this reason, it makes sense to calculate both measures. In cases where both measures gives similar results, the difference in $$e_0$$ reflects not only differences in the mean age at death but takes into account all distributional differences. This might be the case for comparing women and men in most countries becaue men usually show higher death rates at all ages. For those cases where the Wasserstein distance and the difference in $$e_0$$ differ, it might be worthwhile investigating the age-at-death distributions more closely. Obviously, there are other measures such as the standard deviation or interquartile range that provide information on distributional differences. Yet, the calculation of the Wasserstein distance is very similar to deriving differences in $$e_0$$ plus, more importantly, the Wasserstein distance offers a fancy way to think about distributions than the standard approaches :-) Thanks for reading!  
 
 # Notebook
 
