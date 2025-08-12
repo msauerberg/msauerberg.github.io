@@ -37,7 +37,18 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/cv/";
           },
-        },{id: "post-wasserstein-distance",
+        },{id: "post-wasserstein-distance-analysis-using-hmd-data",
+        
+          title: "Wasserstein distance - Analysis using HMD data",
+        
+        description: "Empirical analysis of the Wasserstein distance",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2025/wasserstein_HMD_analysis/";
+          
+        },
+      },{id: "post-wasserstein-distance",
         
           title: "Wasserstein distance",
         
