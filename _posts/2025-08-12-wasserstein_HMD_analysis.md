@@ -127,32 +127,52 @@ HMD_LTs["ex"] = pd.to_numeric(HMD_LTs["ex"], errors='coerce')
 
 # Functions for analysis
 
-The function calculates the survivorship functions from qx. It will calculate the difference in $$e_0$$ and get the Wasserstein distance for the same pair of populations.
+The function calculates the survivorship functions from qx. It will calculate the difference in $$e_0$$ and get the Wasserstein distance for the same pair of populations. In addition, I calculate the Kullback-Leibler divergence using the SciPy package [https://docs.scipy.org](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.entropy.html) and the non-overlap-index (also called the Jaccard index) in accordance with [Shi et al. (2023)](https://www.tandfonline.com/doi/full/10.1080/00324728.2022.2057576).
+
+
 To avoid negative values, it always calculates the difference in $$e_0$$ by substracting the smaller value from the larger one. The function will also check whether the condition $$l_A(x) >= l_B(x)$$ for all $$x$$ holds for the pair.
 Finally, it will return the two county names, the year, sex, condition (True or False), $$e_0$$ difference, as well as the Wasserstein distance as a pandas dataframe.
 
 ```python
-def get_Sx(df):
-    
+from scipy.stats import entropy
+
+def get_dx(df):
+    """Get age-at-death probability distribution dx from lifetable"""
     qx = pd.to_numeric(df["qx"], errors='coerce').values
     if np.any(np.isnan(qx)):
         raise ValueError("NA in qx!")
     lx = np.concatenate(([1], np.cumprod(1 - qx)[:-1]))
     dx = np.concatenate((-np.diff(lx), [lx[-1]]))
-    CDF = np.cumsum(dx)
-    Sx = 1 - CDF
-    return Sx
+    dx = dx / dx.sum()  # normalize to sum to 1 (just in case of rounding issues)
+    return dx
+
+def get_KL_divergence(dx1, dx2):
+    """Get Kullback-Leibler divergence KL"""
+    # add epsilon to avoid log(0)
+    eps = 1e-12
+    dx1_safe = np.clip(dx1, eps, 1)
+    dx2_safe = np.clip(dx2, eps, 1)
+    return float(entropy(dx1_safe, dx2_safe))
+
+def get_Jaccard_distance(dx1, dx2):
+    """Get Jaccard distance between two dx functions"""
+    numerator = np.sum(np.minimum(dx1, dx2))
+    denominator = np.sum(np.maximum(dx1, dx2))
+    if denominator == 0:
+        return 0.0
+    jaccard_similarity = numerator / denominator
+    return 1 - jaccard_similarity
 
 def get_comparison_for_pair(HMD_LTs, year, sex, c1, c2):
 
     subset_df = HMD_LTs[(HMD_LTs["Sex"] == sex) & (HMD_LTs["Year"] == year)].copy()
 
-    Sx_dict = {}
+    dx_dict = {}
     for country in [c1, c2]:
         country_df = subset_df[subset_df["Country"] == country]
         if country_df.empty:
             return None
-        Sx_dict[country] = get_Sx(country_df)
+        dx_dict[country] = get_dx(country_df)
 
     val1 = subset_df.loc[subset_df["Country"] == c1, "ex"].iloc[0]
     val2 = subset_df.loc[subset_df["Country"] == c2, "ex"].iloc[0]
@@ -162,16 +182,19 @@ def get_comparison_for_pair(HMD_LTs, year, sex, c1, c2):
     else:
         countryA, countryB = c2, c1
 
-    Sx1 = Sx_dict[countryA]
-    Sx2 = Sx_dict[countryB]
+    dx1 = dx_dict[countryA]
+    dx2 = dx_dict[countryB]
 
-    if np.all(Sx1 >= Sx2):
-        condition = "True"
-    else:
-        condition = "False"
+    # survival functions
+    Sx1 = 1 - np.cumsum(dx1)
+    Sx2 = 1 - np.cumsum(dx2)
 
+    condition = "True" if np.all(Sx1 >= Sx2) else "False"
     Wasserstein = np.sum(np.abs(Sx1 - Sx2))
     e0_diff = np.sum(Sx1 - Sx2)
+
+    KL_divergence = get_KL_divergence(dx1, dx2)
+    Jaccard_distance = get_Jaccard_distance(dx1, dx2)
 
     return {
         "CountryA": countryA,
@@ -180,6 +203,8 @@ def get_comparison_for_pair(HMD_LTs, year, sex, c1, c2):
         "Sex": sex,
         "e0_Diff": round(e0_diff, 2),
         "Wasserstein": round(Wasserstein, 2),
+        "KL_divergence": round(KL_divergence, 4),
+        "Jaccard_distance": round(Jaccard_distance, 4),
         "Condition": condition
     }
 ```
@@ -274,7 +299,45 @@ print(f"Pearson r: {r:.3f}")
 print(f"P-value: {p_value:.3e}")
 #Pearson r: 0.991
 #P-value: 0.000e+00
+
+# Compute Pearson's r
+r_kl, _ = pearsonr(final_df["Wasserstein"], final_df["KL_divergence"])
+r_jaccard, _ = pearsonr(final_df["Wasserstein"], final_df["Jaccard_distance"])
+
+# plot
+fig, axes = plt.subplots(1, 2, figsize=(14, 6), sharex=False, sharey=False)
+
+axes[0].scatter(final_df["Wasserstein"], final_df["KL_divergence"],
+                alpha=0.6, edgecolor="k")
+axes[0].set_xlabel("Wasserstein distance")
+axes[0].set_ylabel("Kullback–Leibler divergence")
+axes[0].set_title("KL divergence vs. Wasserstein")
+axes[0].grid(True, linestyle="--", alpha=0.5)
+axes[0].text(0.05, 0.95, f"r = {r_kl:.2f}",
+             transform=axes[0].transAxes, fontsize=12,
+             verticalalignment="top", bbox=dict(boxstyle="round", facecolor="white", alpha=0.7))
+
+axes[1].scatter(final_df["Wasserstein"], final_df["Jaccard_distance"],
+                alpha=0.6, edgecolor="k", color="tab:orange")
+axes[1].set_xlabel("Wasserstein distance")
+axes[1].set_ylabel("Jaccard distance")
+axes[1].set_title("Jaccard distance vs. Wasserstein")
+axes[1].grid(True, linestyle="--", alpha=0.5)
+axes[1].text(0.05, 0.95, f"r = {r_jaccard:.2f}",
+             transform=axes[1].transAxes, fontsize=12,
+             verticalalignment="top", bbox=dict(boxstyle="round", facecolor="white", alpha=0.7))
+
+plt.tight_layout()
+plt.show()
+
 ```
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/graph_KL_Jaccard_Wasserstein_1.png" class="img-fluid rounded z-depth-1" zoomable=true %}
+    </div>
+</div>
+
 
 # Find the most interesting cases
 
@@ -319,8 +382,8 @@ df_sorted3.head()
 
 # Plot the most interesting cases
 
-From all 10 000 samples, the largest gap between $$e_0$$ differences and Wasserstein distance is observed between Iceland and England and Wales in 1849 (6.22).
-The largest Wasserstein distance is observed between Norway and Iceland in 1860 with 30.10. This is also the pair with the largest gap in $$e_0$$ in this sample.
+From all 10 000 samples, the largest gap between $$e_0$$ differences and Wasserstein distance is observed between Iceland and England and Wales in 1849 (6.2).
+The largest Wasserstein distance is observed between Sweden and Iceland in 1860 with 28.6. This is also the pair with the largest gap in $$e_0$$ in this sample.
 
 ```python
 def get_dx_for_plot(df, year):
@@ -413,7 +476,7 @@ the_year = 1860
 
 pair1 = HMD_LTs[(HMD_LTs['Year'] == the_year) & 
                (HMD_LTs['Sex'] == "Both") & 
-               (HMD_LTs['Country'] == "NOR")]
+               (HMD_LTs['Country'] == "SWE")]
 
 dx1 = get_dx_for_plot(pair1, the_year)
 e0_1 = get_e0_for_plot(pair1, the_year)
@@ -428,7 +491,7 @@ e0_2 = get_e0_for_plot(pair2, the_year)
 Sx1 = get_Sx_for_plot(dx1)
 Sx2 = get_Sx_for_plot(dx2)
 
-plot_dx(ages, dx1, dx2, e0_1, e0_2, "Norway 1860", "Iceland 1860")
+plot_dx(ages, dx1, dx2, e0_1, e0_2, "Sweden 1860", "Iceland 1860")
 ```
 
 <div class="row mt-3">
@@ -438,7 +501,7 @@ plot_dx(ages, dx1, dx2, e0_1, e0_2, "Norway 1860", "Iceland 1860")
 </div>
 
 ```python
-plot_Sx(ages, Sx1, Sx2, "Norway 1860", "Iceland 1860")
+plot_Sx(ages, Sx1, Sx2, "Sweden 1860", "Iceland 1860")
 ```
 
 <div class="row mt-3">
@@ -454,16 +517,18 @@ Let's focus only on the last decades and examine the relationship observed betwe
 
 ```python
 def get_comparison(HMD_LTs, year, sex):
-
     subset_df = HMD_LTs[(HMD_LTs["Sex"] == sex) & (HMD_LTs["Year"] == year)].copy()
-
     countries = subset_df["Country"].unique()
 
-    Sx_dict = {}
+    # Store dx (age-at-death distributions)
+    dx_dict = {}
     for country in countries:
         country_df = subset_df[subset_df["Country"] == country]
-        Sx_dict[country] = get_Sx(country_df)
+        if country_df.empty:
+            continue
+        dx_dict[country] = get_dx(country_df)
 
+    # All country pairs
     country_pairs = list(itertools.combinations(countries, 2))
 
     results = []
@@ -471,21 +536,27 @@ def get_comparison(HMD_LTs, year, sex):
         val1 = subset_df.loc[subset_df["Country"] == c1, "ex"].iloc[0]
         val2 = subset_df.loc[subset_df["Country"] == c2, "ex"].iloc[0]
 
+        # Define CountryA (higher life expectancy) and CountryB
         if val1 >= val2:
             countryA, countryB = c1, c2
         else:
             countryA, countryB = c2, c1
 
-        Sx1 = Sx_dict[countryA]
-        Sx2 = Sx_dict[countryB]
+        dx1 = dx_dict[countryA]
+        dx2 = dx_dict[countryB]
 
-        if np.all(Sx1 >= Sx2):
-            condition = "True"
-        else:
-            condition = "False"
+        # Get survival functions
+        Sx1 = 1 - np.cumsum(dx1)
+        Sx2 = 1 - np.cumsum(dx2)
 
+        # Condition check
+        condition = "True" if np.all(Sx1 >= Sx2) else "False"
+
+        # Distances
         Wasserstein = np.sum(np.abs(Sx1 - Sx2))
         e0_diff = np.sum(Sx1 - Sx2)
+        KL_divergence = get_KL_divergence(dx1, dx2)
+        Jaccard_distance = get_Jaccard_distance(dx1, dx2)
 
         results.append({
             "CountryA": countryA,
@@ -494,11 +565,12 @@ def get_comparison(HMD_LTs, year, sex):
             "Sex": sex,
             "e0_Diff": round(e0_diff, 2),
             "Wasserstein": round(Wasserstein, 2),
-            "Condition" : condition
+            "KL_divergence": round(KL_divergence, 4),
+            "Jaccard_distance": round(Jaccard_distance, 4),
+            "Condition": condition
         })
 
     diff_df = pd.DataFrame(results)
-
     return diff_df
 
 #get all combinations for women and men, separatly
@@ -586,42 +658,93 @@ for sex in ["Women", "Men"]:
     </div>
 </div>
 
+```python
+for sex in ["Women", "Men"]:
+    df_sex = final_df[final_df["Sex"] == sex]
+    if df_sex.empty:
+        continue
+
+    # Pearson correlations
+    r_kl, _ = pearsonr(df_sex["Wasserstein"], df_sex["KL_divergence"])
+    r_jaccard, _ = pearsonr(df_sex["Wasserstein"], df_sex["Jaccard_distance"])
+
+    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+
+    axes[0].scatter(df_sex["Wasserstein"], df_sex["KL_divergence"],
+                    alpha=0.6, edgecolor="k")
+    axes[0].set_xlabel("Wasserstein distance")
+    axes[0].set_ylabel("Kullback–Leibler divergence")
+    axes[0].set_title(f"{sex}: KL vs. Wasserstein")
+    axes[0].grid(True, linestyle="--", alpha=0.5)
+    axes[0].text(0.05, 0.95, f"r = {r_kl:.2f}",
+                 transform=axes[0].transAxes,
+                 fontsize=12, verticalalignment="top",
+                 bbox=dict(boxstyle="round", facecolor="white", alpha=0.7))
+
+    axes[1].scatter(df_sex["Wasserstein"], df_sex["Jaccard_distance"],
+                    alpha=0.6, edgecolor="k", color="tab:orange")
+    axes[1].set_xlabel("Wasserstein distance")
+    axes[1].set_ylabel("Jaccard distance")
+    axes[1].set_title(f"{sex}: Jaccard vs. Wasserstein")
+    axes[1].grid(True, linestyle="--", alpha=0.5)
+    axes[1].text(0.05, 0.95, f"r = {r_jaccard:.2f}",
+                 transform=axes[1].transAxes,
+                 fontsize=12, verticalalignment="top",
+                 bbox=dict(boxstyle="round", facecolor="white", alpha=0.7))
+
+    plt.tight_layout()
+    plt.show()
+```
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/graph_KL_Jaccard_Wasserstein_2.png" class="img-fluid rounded z-depth-1" zoomable=true %}
+    </div>
+</div>
+
+
 # Third analysis: Investigating sex differences in mortality using the Wasserstein distance
 
 Since women usually outlive men it might be interesting to compare differences between women and men on the basis of the Wasserstein distance.
 
 ```python
 def get_comparison_sex_diff(HMD_LTs, year):
-
     subset_df = HMD_LTs[HMD_LTs["Year"] == year].copy()
     countries = subset_df["Country"].unique()
     results = []
 
     for country in countries:
-        
         women_df = subset_df[(subset_df["Country"] == country) & (subset_df["Sex"] == "Women")]
         men_df = subset_df[(subset_df["Country"] == country) & (subset_df["Sex"] == "Men")]
 
         if women_df.empty or men_df.empty:
             continue
 
-        Sx_women = get_Sx(women_df)
-        Sx_men = get_Sx(men_df)
+        # Get dx distributions
+        dx_women = get_dx(women_df)
+        dx_men = get_dx(men_df)
 
-        if np.all(Sx_women >= Sx_men):
-            condition = "True"
-        else:
-            condition = "False"
-        
-        e0_diff = np.sum(Sx_women-Sx_men) 
+        # Survival functions (needed for Wasserstein + condition)
+        Sx_women = 1 - np.cumsum(dx_women)
+        Sx_men = 1 - np.cumsum(dx_men)
+
+        # Condition check
+        condition = "True" if np.all(Sx_women >= Sx_men) else "False"
+
+        # Distances
+        e0_diff = np.sum(Sx_women - Sx_men)
         wasserstein = np.sum(np.abs(Sx_women - Sx_men))
+        KL_divergence = get_KL_divergence(dx_women, dx_men)
+        Jaccard_distance = get_Jaccard_distance(dx_women, dx_men)
 
         results.append({
             "Country": country,
             "Year": year,
             "e0_Diff": round(e0_diff, 2),
             "Wasserstein": round(wasserstein, 2),
-            "Condition" : condition
+            "KL_divergence": round(KL_divergence, 4),
+            "Jaccard_distance": round(Jaccard_distance, 4),
+            "Condition": condition
         })
 
     diff_df = pd.DataFrame(results)
@@ -682,10 +805,48 @@ plt.show()
     </div>
 </div>
 
+```python
+r_kl, _ = pearsonr(final_df_sex_diff["Wasserstein"], final_df_sex_diff["KL_divergence"])
+r_jaccard, _ = pearsonr(final_df_sex_diff["Wasserstein"], final_df_sex_diff["Jaccard_distance"])
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+
+axes[0].scatter(final_df_sex_diff["Wasserstein"], final_df_sex_diff["KL_divergence"],
+                alpha=0.6, edgecolor="k")
+axes[0].set_xlabel("Wasserstein distance")
+axes[0].set_ylabel("Kullback–Leibler divergence")
+axes[0].set_title("Sex differences: KL vs. Wasserstein")
+axes[0].grid(True, linestyle="--", alpha=0.5)
+axes[0].text(0.05, 0.95, f"r = {r_kl:.2f}",
+             transform=axes[0].transAxes, fontsize=12,
+             verticalalignment="top",
+             bbox=dict(boxstyle="round", facecolor="white", alpha=0.7))
+
+axes[1].scatter(final_df_sex_diff["Wasserstein"], final_df_sex_diff["Jaccard_distance"],
+                alpha=0.6, edgecolor="k", color="tab:orange")
+axes[1].set_xlabel("Wasserstein distance")
+axes[1].set_ylabel("Jaccard distance")
+axes[1].set_title("Sex differences: Jaccard vs. Wasserstein")
+axes[1].grid(True, linestyle="--", alpha=0.5)
+axes[1].text(0.05, 0.95, f"r = {r_jaccard:.2f}",
+             transform=axes[1].transAxes, fontsize=12,
+             verticalalignment="top",
+             bbox=dict(boxstyle="round", facecolor="white", alpha=0.7))
+
+plt.tight_layout()
+plt.show()
+```
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/graph_KL_Jaccard_Wasserstein_3.png" class="img-fluid rounded z-depth-1" zoomable=true %}
+    </div>
+</div>
+
 # Conclusions
 
 The analysis suggests that the difference in $$e_0$$ is often very similar to the Wasserstein distance. This indicates that the difference in the mean age at death can be interpreted as distributional differences in most cases.
-We do find examples where both measures do not correspond to each other at all. For instance, England and Wales shows a very similar mean age at death (or life expectancy at birth) to Iceland in the year 1849. Yet, the Wasserstein distance suggests that the age-at-death distributions differ substantially from each other. It's value is about 6, while the Wasserstein distance is on average about 4. Theoretically, the Wasserstein distance can be 110 because we are looking at single ages from 0 to 110+. The reason for the deviation between $$e_0$$ differences and the Wasserstein distance is the particulary large infant mortality in Iceland with lower mortality at older ages. For more recent years and especially when comparing the mortality of women and men, differences in $$e_0$$ and the Wasserstein distance correspond to each other very strongly (the yearly difference in both measures is on average below 0.5 and for sex differences in mortality even close to 0.0).
+We do find examples where both measures do not correspond to each other at all. For instance, England and Wales shows a very similar mean age at death (or life expectancy at birth) to Iceland in the year 1849. Yet, the Wasserstein distance suggests that the age-at-death distributions differ substantially from each other. It's value is about 6, while the Wasserstein distance is on average about 4. Theoretically, the Wasserstein distance can be 110 because we are looking at single ages from 0 to 110+. The reason for the deviation between $$e_0$$ differences and the Wasserstein distance is the particulary large infant mortality in Iceland with lower mortality at older ages. For more recent years and especially when comparing the mortality of women and men, differences in $$e_0$$ and the Wasserstein distance correspond to each other very strongly (the yearly difference in both measures is on average below 0.5 and for sex differences in mortality even close to 0.0). Finally, the results indicate that there is a strong correlation between the Wasserstein distance and the non-overlap index (Jaccard index) as well as between the Wasserstein distance and the KL-divergence. In other words, the three measures evaluate distributional differences very similar. 
 
 # Notebook 
 
