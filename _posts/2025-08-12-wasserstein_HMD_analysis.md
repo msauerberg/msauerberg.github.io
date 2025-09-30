@@ -855,3 +855,19 @@ We do find examples where both measures do not correspond to each other at all. 
 # Notebook 
 
 The jupyter notebook can be found here: [https://github.com/msauerberg/msauerberg.github.io/blob/main/assets/jupyter/Wasserstein_HMD_analysis.ipynb](https://github.com/msauerberg/msauerberg.github.io/blob/main/assets/jupyter/Wasserstein_HMD_analysis.ipynb).
+
+# Paper
+
+The paper can be found here: [https://arxiv.org/abs/2508.17235](https://arxiv.org/abs/2508.17235).
+
+```bibtex
+@misc{sauerberg2025,
+  title={On the relationship between the Wasserstein distance and differences in life expectancy at birth}, 
+  author={Markus Sauerberg},
+  year={2025},
+  eprint={2508.17235},
+  archivePrefix={arXiv},
+  primaryClass={stat.AP},
+  url={https://arxiv.org/abs/2508.17235}, 
+}
+´´´
