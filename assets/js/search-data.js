@@ -37,7 +37,18 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/cv/";
           },
-        },{id: "post-wasserstein-distance-analysis-using-hmd-data",
+        },{id: "post-mcp-server-spotify-and-claude",
+        
+          title: "MCP Server - Spotify and Claude",
+        
+        description: "Building an MCP Server to use Spotify with Claude",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2025/mcp_server/";
+          
+        },
+      },{id: "post-wasserstein-distance-analysis-using-hmd-data",
         
           title: "Wasserstein distance - Analysis using HMD data",
         
