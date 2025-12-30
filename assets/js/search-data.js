@@ -37,7 +37,18 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/cv/";
           },
-        },{id: "post-mcp-server-spotify-and-claude",
+        },{id: "post-sunset-calculations-with-astral",
+        
+          title: "Sunset calculations with astral",
+        
+        description: "Calculating sunset daily times for a given year",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2025/sunset/";
+          
+        },
+      },{id: "post-mcp-server-spotify-and-claude",
         
           title: "MCP Server - Spotify and Claude",
         
