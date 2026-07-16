@@ -37,7 +37,18 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/cv/";
           },
-        },{id: "post-sunset-calculations-with-astral",
+        },{id: "post-hitzetote-sinnvoll-oder-pseudowissenschaftlich",
+        
+          title: "Hitzetote: Sinnvoll oder pseudowissenschaftlich?",
+        
+        description: "Analyse und Diskussion der Hitzetoten in Deutschland",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/heat_de/";
+          
+        },
+      },{id: "post-sunset-calculations-with-astral",
         
           title: "Sunset calculations with astral",
         
