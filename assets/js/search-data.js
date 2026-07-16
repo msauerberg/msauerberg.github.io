@@ -37,9 +37,9 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/cv/";
           },
-        },{id: "post-hitzetote-sinnvoll-oder-pseudowissenschaftlich",
+        },{id: "post-hitzetote-was-hinter-den-zahlen-steckt",
         
-          title: "Hitzetote: Sinnvoll oder pseudowissenschaftlich?",
+          title: "Hitzetote: Was hinter den Zahlen steckt",
         
         description: "Analyse und Diskussion der Hitzetoten in Deutschland",
         section: "Posts",
