@@ -237,3 +237,7 @@ When the survivorship functions between two populations do not crossover, the Wa
 # Notebook
 
 The jupyter notebook can be found here: [https://github.com/msauerberg/msauerberg.github.io/blob/main/assets/jupyter/wasserstein.ipynb](https://github.com/msauerberg/msauerberg.github.io/blob/main/assets/jupyter/wasserstein.ipynb).
+
+# Use of AI
+
+I used ChatGPT by OpenAI to assist with the development of the code. AI was also used in the preparation of this blog post, including brainstorming, improving the wording, translations, and formatting. The content was reviewed, verified, and finalized by me.

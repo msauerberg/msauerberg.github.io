@@ -871,3 +871,7 @@ The paper can be found here: [https://arxiv.org/abs/2508.17235](https://arxiv.or
   url={https://arxiv.org/abs/2508.17235}, 
 }
 ```
+
+# Use of AI
+
+I used ChatGPT by OpenAI to assist with the development of the code. AI was also used in the preparation of this blog post, including brainstorming, improving the wording, translations, and formatting. The content was reviewed, verified, and finalized by me.

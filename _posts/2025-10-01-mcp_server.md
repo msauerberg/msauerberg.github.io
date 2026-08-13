@@ -277,3 +277,7 @@ After approval, it will use the tool and report its result back to you.
 # More options, more functions
 
 This is just a simple test to see how the MCP server works. There are at least two much better MCP Servers for Spotify available, see [https://github.com/varunneal/spotify-mcp](https://github.com/varunneal/spotify-mcp) and [https://github.com/marcelmarais/spotify-mcp-server](https://github.com/marcelmarais/spotify-mcp-server). They allow not only to get the top tracks but to create playlists, get recently played songs and much more. Thanks for reading.
+
+# Use of AI
+
+I used ChatGPT by OpenAI and Claude by Anthropic to assist with the development of the code. AI was also used in the preparation of this blog post, including brainstorming, improving the wording, translations, and formatting. The content was reviewed, verified, and finalized by me.
